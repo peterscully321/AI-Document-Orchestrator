@@ -10,38 +10,6 @@
 
 ---
 
-## 📑 Table of Contents
-
-- [✨ Features](#-features)
-- [🚀 Quick Start](#-quick-start)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation-2-minutes)
-  - [Launch Interactive UI](#launch-interactive-ui)
-  - [Command Line Usage](#command-line-usage)
-- [🏗️ Architecture](#️-architecture)
-  - [High-Level Overview](#high-level-overview)
-  - [Components](#components)
-  - [Project Structure](#project-structure)
-- [📦 Installation](#-installation)
-- [🔑 API Setup](#-api-setup)
-  - [Google Gemini API](#google-gemini-api-required)
-  - [Tavily API](#tavily-api-required)
-  - [Google Docs API](#google-docs-api-optional-)
-- [💻 Usage](#-usage)
-  - [Interactive Web UI](#-interactive-web-ui-recommended)
-  - [Command Line Interface](#-command-line-interface)
-  - [Python API](#-python-api)
-  - [Examples](#-examples)
-- [🔄 Workflow Details](#-workflow-details)
-- [🔌 Agent Communication](#-agent-communication)
-- [🛠️ Development](#️-development)
-- [📖 Documentation](#-documentation)
-- [🤝 Contributing](#-contributing)
-- [📝 License](#-license)
-- [📞 Support & Community](#-support--community)
-
----
-
 ## ✨ Features
 
 - 🔍 **Intelligent Research** - Automated web search and data gathering using Tavily
@@ -558,3 +526,5 @@ Built with amazing technologies:
 **⭐ If this project helps you, please give it a star!**
 
 **[🔝 Back to top](#-ai-document-orchestrator)**
+#   A I - D o c u m e n t - O r c h e s t r a t o r  
+ 
