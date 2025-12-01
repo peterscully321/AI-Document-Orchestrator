@@ -1,14 +1,3 @@
-Below is your **cleaned, corrected, and GitHub-ready README.md** — fully formatted, consistent, and free from typos (including the repository name: **AI-Document-Orchestrator**, not *Orchestartor*).
-
-I preserved your content but fixed formatting, grammar, broken links, headings, and structure.
-
----
-
-# ✅ **Corrected & Polished README.md for GitHub**
-
-> **COPY & PASTE the entire block below into your `README.md` file.**
-
----
 
 ````markdown
 # 🤖 AI Document Orchestrator
