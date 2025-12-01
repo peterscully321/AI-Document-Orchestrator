@@ -1,0 +1,43 @@
+[project]
+name = "ai-doc-orchestrator"
+version = "0.1.0"
+description = "Multi-agent system for AI-powered document generation"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "google-generativeai>=0.3.0",
+    "pydantic>=2.0.0",
+    "tavily-python>=0.3.0",
+    "google-api-python-client>=2.0.0",
+    "google-auth>=2.0.0",
+    "reportlab>=4.0.0",
+    "python-dotenv>=1.0.0",
+    "streamlit>=1.28.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+    "mypy>=1.0.0",
+]
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.black]
+line-length = 100
+target-version = ['py310']
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+

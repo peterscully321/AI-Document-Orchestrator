@@ -1,0 +1,246 @@
+Metadata-Version: 2.4
+Name: ai-doc-orchestrator
+Version: 0.1.0
+Summary: Multi-agent system for AI-powered document generation
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: google-generativeai>=0.3.0
+Requires-Dist: pydantic>=2.0.0
+Requires-Dist: tavily-python>=0.3.0
+Requires-Dist: google-api-python-client>=2.0.0
+Requires-Dist: google-auth>=2.0.0
+Requires-Dist: reportlab>=4.0.0
+Requires-Dist: python-dotenv>=1.0.0
+Requires-Dist: streamlit>=1.28.0
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0.0; extra == "dev"
+Requires-Dist: pytest-asyncio>=0.21.0; extra == "dev"
+Requires-Dist: black>=23.0.0; extra == "dev"
+Requires-Dist: ruff>=0.1.0; extra == "dev"
+Requires-Dist: mypy>=1.0.0; extra == "dev"
+
+# AI Document Orchestrator
+
+This project is a multi-agent system that takes a **user input topic and format**, performs web research, summarizes and structures the information, and then generates high-quality documents (e.g., Google Docs and PDFs) through an iterative quality-check loop.
+
+## High-Level Architecture
+
+```mermaid path=null start=null
+graph TD
+    User[User Input: Topic & Format] --> Orchestrator[Orchestrator Agent]
+    
+    subgraph "Phase 1: Information Gathering"
+    Orchestrator -- A2A Handoff --> Research[Research Agent]
+    Research -- Uses Tool --> GoogleSearch[Google Search / Tavily]
+    Research --> RawData[Raw Data Collection]
+    end
+    
+    subgraph "Phase 2: Processing"
+    RawData --> Summary[Summary Agent]
+    Summary -- Uses Tool --> MCP_Read[MCP: File System Read]
+    Summary --> StructNotes[Structured Notes]
+    end
+    
+    subgraph "Phase 3: Creation & Iteration (The Loop)"
+    StructNotes --> Writer[Writer Agent]
+    Writer --> Draft[Initial Draft]
+    Draft --> QC[Quality Check Agent]
+    QC -- "Feedback: Needs Improvement" --> Writer
+    QC -- "Feedback: Approved" --> Formatting[Formatting Agent]
+    end
+    
+    subgraph "Phase 4: Output"
+    Formatting -- Uses OpenAPI --> GoogleDocs[Google Docs API]
+    Formatting -- Uses OpenAPI --> PDF_Gen[PDF Generator]
+    Formatting --> FinalFile[Final Downloadable File]
+    end
+```
+
+## Phases and Responsibilities
+
+- **Phase 1: Information Gathering**
+  - Orchestrator hands off to the Research agent.
+  - Research agent uses tools like Google Search / Tavily to gather raw data.
+
+- **Phase 2: Processing**
+  - Summary agent digests Raw Data into concise summaries.
+  - Uses MCP file system read to incorporate any local references.
+  - Outputs structured notes as a canonical internal representation.
+
+- **Phase 3: Creation & Iteration**
+  - Writer agent transforms Structured Notes into an initial draft.
+  - Quality Check agent reviews drafts and either approves them or sends feedback to the Writer to iterate.
+
+- **Phase 4: Output**
+  - Formatting agent converts approved drafts into final deliverables.
+  - Integrations:
+    - Google Docs API for collaborative documents.
+    - PDF generator for downloadable files.
+
+## Implementation
+
+This project is implemented in **Python** using:
+- **Google Gemini API** for LLM-powered agents
+- **Tavily API** for web search
+- **Pydantic** for data models and validation
+- **ReportLab** for PDF generation
+- **Google Docs API** for Google Docs integration
+
+### Project Structure
+
+```
+src/ai_doc_orchestrator/
+├── __init__.py
+├── models.py              # Data models (UserInput, RawData, StructuredNotes, etc.)
+├── base_agent.py          # Base agent class with A2A handoff support
+├── agents/
+│   ├── research.py        # Research Agent (Phase 1)
+│   ├── summary.py         # Summary Agent (Phase 2)
+│   ├── writer.py          # Writer Agent (Phase 3)
+│   ├── qc.py              # Quality Check Agent (Phase 3)
+│   └── formatting.py      # Formatting Agent (Phase 4)
+├── tools/
+│   ├── search.py          # Tavily/Google Search tool
+│   ├── mcp_filesystem.py  # MCP File System Read tool
+│   ├── google_docs.py     # Google Docs API tool
+│   └── pdf_generator.py   # PDF generator tool
+└── orchestrator/
+    └── orchestrator.py    # Main orchestrator coordinating all phases
+```
+
+## Installation
+
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd ai-doc-orchestrator
+```
+
+2. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+3. Set up API keys:
+```bash
+# Create .env file
+cp .env.example .env
+# Edit .env and add your API keys
+```
+
+**📋 See [API_SETUP.md](API_SETUP.md) for detailed API setup instructions!**
+
+**Quick summary:**
+- ✅ **Required:** `GOOGLE_GEMINI_API_KEY` - Get from https://makersuite.google.com/app/apikey
+- ✅ **Required:** `TAVILY_API_KEY` - Get from https://tavily.com
+- ⚪ **Optional:** `GOOGLE_CREDENTIALS_PATH` - Only needed for Google Docs output
+
+## Usage
+
+### 🎨 Interactive UI (Recommended)
+
+Launch the beautiful web interface:
+
+```bash
+streamlit run app.py
+```
+
+Or use the convenience script:
+- **Windows**: `run_ui.bat`
+- **Linux/Mac**: `./run_ui.sh`
+
+The UI includes:
+- 📝 **Document Generator** - Full document generation with research
+- 📄 **Summarizer** - Quick content summarization
+- ✍️ **Blog Writer** - Create engaging blog posts
+- ⚙️ **Settings** - API configuration and system info
+
+### Command Line
+
+```bash
+python -m ai_doc_orchestrator.main "Your Topic Here" pdf
+```
+
+Formats: `text`, `pdf`, `google_docs`
+
+### Python API
+
+```python
+import asyncio
+from ai_doc_orchestrator.models import UserInput, OutputFormat
+from ai_doc_orchestrator.orchestrator import DocumentOrchestrator
+
+async def main():
+    orchestrator = DocumentOrchestrator()
+    
+    user_input = UserInput(
+        topic="Machine Learning Basics",
+        format=OutputFormat.PDF
+    )
+    
+    result = await orchestrator.process(user_input)
+    print(f"Generated: {result.file_path}")
+
+asyncio.run(main())
+```
+
+### Example Script
+
+See `example.py` for more detailed examples.
+
+## Workflow
+
+1. **Phase 1: Information Gathering**
+   - Orchestrator receives user input (topic + format)
+   - Hands off to Research Agent via A2A message
+   - Research Agent uses Tavily to search the web
+   - Returns raw data collection
+
+2. **Phase 2: Processing**
+   - Summary Agent receives raw data
+   - Uses MCP File System tool to read local files (if provided)
+   - Creates structured notes with summary, key points, and sources
+
+3. **Phase 3: Creation & Iteration (The Loop)**
+   - Writer Agent creates initial draft from structured notes
+   - QC Agent reviews the draft
+   - If not approved, feedback is sent back to Writer Agent
+   - Loop continues (max 3 iterations) until approved
+
+4. **Phase 4: Output**
+   - Formatting Agent receives approved draft
+   - Generates final output in requested format:
+     - **Text**: Returns content as string
+     - **PDF**: Creates PDF file using ReportLab
+     - **Google Docs**: Creates Google Doc via API
+
+## Agent-to-Agent (A2A) Communication
+
+Agents communicate through `AgentMessage` objects containing:
+- Source and target agent names
+- Current phase
+- Data payload
+- Metadata
+
+The orchestrator manages the flow of messages between agents.
+
+## Development
+
+### Running Tests
+
+```bash
+pytest tests/
+```
+
+### Code Quality
+
+```bash
+# Format code
+black src/
+
+# Lint
+ruff check src/
+
+# Type check
+mypy src/
+```
