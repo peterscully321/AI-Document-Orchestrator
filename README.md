@@ -1,5 +1,3 @@
-
-````markdown
 # 🤖 AI Document Orchestrator
 
 > A powerful multi-agent system that transforms topics into professional documents through intelligent research, writing, and iterative quality checking.
@@ -7,25 +5,41 @@
 [![Python Version](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![GitHub Stars](https://img.shields.io/github/stars/peterscully321/AI-Document-Orchestrator?style=social)](https://github.com/peterscully321/AI-Document-Orchestrator)
+![Repo size](https://img.shields.io/github/repo-size/peterscully321/AI-Document-Orchestrator)
+![Code style](https://img.shields.io/badge/code%20style-black-000000.svg)
 
-**📖 [Documentation](https://github.com/peterscully321/AI-Document-Orchestrator/wiki)** |  
-**🚀 [Quick Start](#-quick-start)** |  
-**📝 [API Docs](#-api-setup)** |  
-**🐛 [Report Bug](https://github.com/peterscully321/AI-Document-Orchestrator/issues)**
+**📖 [Documentation](https://github.com/peterscully321/AI-Document-Orchestrator/wiki)** · **🚀 [Quick Start](#-quick-start)** · **📝 [API Setup](#-api-setup)** · **🐛 [Report Bug](https://github.com/peterscully321/AI-Document-Orchestrator/issues)**
 
 ---
 
 ## ✨ Features
 
-- 🔍 **Intelligent Research** — Automated web search using Tavily  
-- 📝 **Smart Summarization** — Extract structured insights  
-- ✍️ **Content Writing** — Produces high-quality documents  
-- ✅ **Quality Assurance** — Iterative feedback loop  
-- 📄 **Multiple Formats** — PDF, Google Docs, or text  
-- 🎨 **Interactive UI** — Streamlit interface  
-- 🔄 **Agent Communication** — A2A protocol  
-- ⚡ **Async Processing** — Non-blocking operations  
-- 🔐 **Secure API Integration** — Environment variables only  
+- 🔍 **Intelligent Research** — Automated web search using Tavily
+- 📝 **Smart Summarization** — Extract structured insights
+- ✍️ **Content Writing** — Produces high-quality documents
+- ✅ **Quality Assurance** — Iterative feedback loop
+- 📄 **Multiple Formats** — PDF, Google Docs, or text
+- 🎨 **Interactive UI** — Streamlit interface
+- 🔄 **Agent Communication** — A2A protocol
+- ⚡ **Async Processing** — Non-blocking operations
+- 🔐 **Secure API Integration** — Environment variables only
+
+---
+
+## 🧭 Table of Contents
+
+- [🚀 Quick Start](#-quick-start)
+- [🏗️ Architecture](#-architecture)
+- [📦 Installation Details](#-installation-details)
+- [🔑 API Setup](#-api-setup)
+- [💻 Usage](#-usage)
+- [🔄 Detailed Workflow](#-detailed-workflow)
+- [🛠️ Development](#-development)
+- [📖 Documentation](#-documentation)
+- [🤝 Contributing](#-contributing)
+- [📝 License](#-license)
+- [📞 Support](#-support)
+- [🙏 Acknowledgments](#-acknowledgments)
 
 ---
 
@@ -35,8 +49,6 @@
 - Python **3.10+**
 - `pip`
 - API keys: **Google Gemini** + **Tavily**
-
----
 
 ### Installation (2 minutes)
 
@@ -52,9 +64,7 @@ python -m venv .venv
 
 # Install dependencies
 pip install -r requirements.txt
-````
-
----
+```
 
 ### Launch Interactive UI
 
@@ -71,8 +81,6 @@ streamlit run app.py
 
 Open: **[http://localhost:8501](http://localhost:8501)**
 
----
-
 ### Command Line Usage
 
 ```bash
@@ -87,7 +95,7 @@ python -m ai_doc_orchestrator.main "Your Topic Here" text
 
 ### High-Level Overview
 
-```
+```text
 User Input → Research → Summarize → Write + QC → Format → Final Document
 ```
 
@@ -151,10 +159,8 @@ Get your key:
 Add to `.env`:
 
 ```env
-GOOGLE_GEMINI_API_KEY=AIzaSyxxxxxxxxxxxxxxxxxxxx
+GOOGLE_GEMINI_API_KEY=your_key_here
 ```
-
----
 
 ### Tavily API (Required)
 
@@ -162,10 +168,8 @@ Get your key:
 [https://tavily.com](https://tavily.com)
 
 ```env
-TAVILY_API_KEY=tvly-xxxxxxxxxxxxxxxxxxxxx
+TAVILY_API_KEY=your_key_here
 ```
-
----
 
 ### Google Docs API (Optional)
 
@@ -187,8 +191,6 @@ run_ui.bat          # Windows
 streamlit run app.py
 ```
 
----
-
 ### CLI
 
 ```bash
@@ -207,9 +209,9 @@ async def main():
         gemini_api_key="your_key",
         tavily_api_key="your_key"
     )
-    
+
     user_input = UserInput(topic="ML Basics", format=OutputFormat.PDF)
-    
+
     result = await orchestrator.process(user_input)
     print("Generated:", result.file_path)
 
@@ -220,12 +222,12 @@ asyncio.run(main())
 
 ## 🔄 Detailed Workflow
 
-**1. User Input →** Topic + format
-**2. Research Agent →** Tavily search
-**3. Summary Agent →** Extract structure
-**4. Writer Agent →** Generate draft
-**5. QC Agent →** Review & iterate
-**6. Formatting Agent →** PDF/Text/Google Docs
+1. **User Input** → Topic + format
+2. **Research Agent** → Tavily search
+3. **Summary Agent** → Extract structure
+4. **Writer Agent** → Generate draft
+5. **QC Agent** → Review & iterate
+6. **Formatting Agent** → PDF/Text/Google Docs
 
 ---
 
@@ -254,10 +256,10 @@ mypy src/
 
 ## 📖 Documentation
 
-* **Quick Start:** QUICK_START.md
-* **API Setup:** API_SETUP.md
-* **UI Guide:** README_UI.md
-* **WARP Guide:** WARP.md
+- **Quick Start:** `QUICK_START.md`
+- **API Setup:** `API_SETUP.md`
+- **UI Guide:** `README_UI.md`
+- **WARP Guide:** `WARP.md`
 
 ---
 
@@ -279,35 +281,22 @@ MIT License — see `LICENSE`
 
 ## 📞 Support
 
-* Issues: [https://github.com/peterscully321/AI-Document-Orchestrator/issues](https://github.com/peterscully321/AI-Document-Orchestrator/issues)
-* Wiki: [https://github.com/peterscully321/AI-Document-Orchestrator/wiki](https://github.com/peterscully321/AI-Document-Orchestrator/wiki)
+- Issues: [https://github.com/peterscully321/AI-Document-Orchestrator/issues](https://github.com/peterscully321/AI-Document-Orchestrator/issues)
+- Wiki: [https://github.com/peterscully321/AI-Document-Orchestrator/wiki](https://github.com/peterscully321/AI-Document-Orchestrator/wiki)
 
 ---
 
 ## 🙏 Acknowledgments
 
-* Google Generative AI
-* Tavily
-* Streamlit
-* Pydantic
-* ReportLab
-* Python
-
----
-
-## 📊 Project Stats
-
-![Repo size](https://img.shields.io/github/repo-size/peterscully321/AI-Document-Orchestrator)
-![Code style](https://img.shields.io/badge/code%20style-black-000000.svg)
-![Python Version](https://img.shields.io/badge/python-3.10+-blue.svg)
+- Google Generative AI
+- Tavily
+- Streamlit
+- Pydantic
+- ReportLab
+- Python
 
 ---
 
 **⭐ If this project helps you, please give it a star!**
 
 [🔝 Back to top](#-ai-document-orchestrator)
-
-```
-
----
-
