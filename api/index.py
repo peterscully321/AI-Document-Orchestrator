@@ -13,7 +13,7 @@ import tempfile
 from http.server import BaseHTTPRequestHandler
 from pathlib import Path
 from typing import Any, Dict
-from urllib.parse import urlparse
+from urllib.parse import parse_qs, urlparse
 
 from dotenv import load_dotenv
 
@@ -183,12 +183,18 @@ async def _blog(payload: Dict[str, Any], output_dir: str) -> Dict[str, Any]:
 class handler(BaseHTTPRequestHandler):
     """Vercel-compatible HTTP handler."""
 
+    def _api_route(self) -> str:
+        parsed = urlparse(self.path)
+        route = parse_qs(parsed.query).get("route", [""])[0].strip("/")
+        if route:
+            return route
+        return parsed.path.rstrip("/").rsplit("/", 1)[-1]
+
     def do_OPTIONS(self):
         _json_response(self, 204, {})
 
     def do_GET(self):
-        path = urlparse(self.path).path
-        if path == "/api/health":
+        if self._api_route() == "health":
             _json_response(self, 200, {"ok": True, "service": "ai-document-orchestrator"})
             return
         _json_response(self, 404, {"error": "Not found"})
@@ -197,14 +203,14 @@ class handler(BaseHTTPRequestHandler):
         try:
             length = int(self.headers.get("Content-Length", "0"))
             payload = json.loads(self.rfile.read(length) or b"{}")
-            path = urlparse(self.path).path
+            route = self._api_route()
 
             with tempfile.TemporaryDirectory(prefix="ai-doc-") as output_dir:
-                if path == "/api/generate":
+                if route == "generate":
                     result = _run(_generate(payload, output_dir))
-                elif path == "/api/summarize":
+                elif route == "summarize":
                     result = _run(_summarize(payload, output_dir))
-                elif path == "/api/blog":
+                elif route == "blog":
                     result = _run(_blog(payload, output_dir))
                 else:
                     _json_response(self, 404, {"error": "Not found"})
