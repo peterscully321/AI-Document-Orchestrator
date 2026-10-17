@@ -1,0 +1,17 @@
+# The Vercel deployment uses the Python API, not the local Streamlit app.
+app.py
+example.py
+run_ui.bat
+run_ui.sh
+requirements-ui.txt
+
+# Documentation and local-only assets are not needed by the serverless API.
+*.md
+*.pdf
+.devcontainer/
+
+# Never send local Python caches or generated package metadata to the function.
+**/__pycache__/
+*.py[cod]
+*.egg-info/
+.env*

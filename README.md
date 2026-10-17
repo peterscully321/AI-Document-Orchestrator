@@ -63,7 +63,7 @@ python -m venv .venv
 # source .venv/bin/activate  # Linux/Mac
 
 # Install dependencies
-pip install -r requirements.txt
+pip install -r requirements-ui.txt
 ```
 
 ### Launch Interactive UI
@@ -149,6 +149,12 @@ python -m venv .venv
 
 ```bash
 pip install -r requirements.txt
+```
+
+For the local Streamlit interface, install the UI-only dependency set instead:
+
+```bash
+pip install -r requirements-ui.txt
 ```
 
 ### Step 4 — Environment Variables

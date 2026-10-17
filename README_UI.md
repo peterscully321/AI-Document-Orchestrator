@@ -4,7 +4,7 @@
 
 1. **Install Streamlit** (if not already installed):
    ```bash
-   pip install streamlit
+   pip install -r requirements-ui.txt
    ```
 
 2. **Run the UI**:
@@ -56,7 +56,7 @@
 
 ## Troubleshooting
 
-- **UI not loading**: Make sure Streamlit is installed (`pip install streamlit`)
+- **UI not loading**: Make sure the UI dependencies are installed (`pip install -r requirements-ui.txt`)
 - **API errors**: Check your `.env` file has correct API keys
 - **Slow generation**: This is normal - the system performs research, summarization, and quality checks
 

@@ -1,0 +1,3 @@
+# Local-only dependencies for the Streamlit interface.
+-r requirements.txt
+streamlit>=1.28.0
