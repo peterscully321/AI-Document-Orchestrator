@@ -186,7 +186,26 @@
 
       async function request(endpoint, payload) {
         setBusy(true); progress('Researching and gathering context…', 28);
-        const response = await fetch(endpoint, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
+        const controller = new AbortController();
+        const timeoutId = window.setTimeout(() => controller.abort(), 240000);
+        const startedAt = Date.now();
+        const statusTimer = window.setInterval(() => {
+          const elapsed = Math.floor((Date.now() - startedAt) / 1000);
+          $('progress-label').textContent = elapsed < 30
+            ? 'Researching and gathering context…'
+            : `Still working — ${Math.floor(elapsed / 60)}m ${elapsed % 60}s elapsed.`;
+          $('progress-value').textContent = `${elapsed}s`;
+        }, 1000);
+        let response;
+        try {
+          response = await fetch(endpoint, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload), signal: controller.signal });
+        } catch (error) {
+          if (controller.signal.aborted) throw new Error('This request took too long. Please try again with a shorter topic.');
+          throw error;
+        } finally {
+          window.clearTimeout(timeoutId);
+          window.clearInterval(statusTimer);
+        }
         progress('Writing and checking the result…', 74);
         const data = await response.json();
         if (!response.ok || !data.ok) throw new Error(data.error || 'Something went wrong.');

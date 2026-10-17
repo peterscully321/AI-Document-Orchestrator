@@ -45,7 +45,7 @@ class ResearchAgent(BaseAgent):
         user_prompt = f"Topic: {topic}\n\nGenerate search queries:"
 
         queries_text = self._call_llm(system_prompt, user_prompt, temperature=0.7)
-        queries = [q.strip() for q in queries_text.split("\n") if q.strip()][:5]
+        queries = [q.strip() for q in queries_text.split("\n") if q.strip()][:3]
 
         # Perform searches
         all_results = []

@@ -95,6 +95,7 @@ async def _generate(payload: Dict[str, Any], output_dir: str) -> Dict[str, Any]:
     result = await orchestrator.process(
         UserInput(topic=topic, format=OutputFormat(output_format)),
         local_files=[],
+        max_iterations=1,
     )
     return _serialize_output(result)
 

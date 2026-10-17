@@ -81,7 +81,12 @@ class DocumentOrchestrator:
         pdf_tool = PDFGeneratorTool(output_dir=output_dir)
         self.formatting_agent.set_pdf_tool(pdf_tool)
 
-    async def process(self, user_input: UserInput, local_files: Optional[list] = None) -> FinalOutput:
+    async def process(
+        self,
+        user_input: UserInput,
+        local_files: Optional[list] = None,
+        max_iterations: int = 3,
+    ) -> FinalOutput:
         """Process user input through all phases.
 
         Args:
@@ -122,7 +127,7 @@ class DocumentOrchestrator:
         # Phase 3: Creation & Iteration (The Loop)
         print("Phase 3: Creation & Iteration...")
         draft_version = 1
-        max_iterations = 3
+        max_iterations = max(1, min(max_iterations, 3))
         qc_feedback_text = ""
 
         while draft_version <= max_iterations:
