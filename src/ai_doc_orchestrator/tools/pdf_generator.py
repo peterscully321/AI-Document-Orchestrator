@@ -17,6 +17,45 @@ except ImportError:
     SimpleDocTemplate = None
 
 
+def _format_inline_markup(text: str) -> str:
+    """Convert common Markdown and simple inline LaTeX into ReportLab markup."""
+    parts = re.split(r"(\$[^$\n]+\$)", text)
+    formatted_parts = []
+    for part in parts:
+        if part.startswith("$") and part.endswith("$"):
+            expression = part[1:-1].strip()
+            expression = re.sub(
+                r"\\(?:text|mathrm|mathbf)\{([^{}]*)\}", r"\1", expression
+            )
+            expression = (
+                expression.replace(r"\times", "×")
+                .replace(r"\cdot", "·")
+                .replace(r"\le", "≤")
+                .replace(r"\ge", "≥")
+                .replace(r"\approx", "≈")
+                .replace(r"\in", "∈")
+            )
+            expression = escape(expression)
+            expression = re.sub(
+                r"\^\{?([A-Za-z0-9+\-=]+)\}?",
+                r"<super>\1</super>",
+                expression,
+            )
+            expression = re.sub(
+                r"_\{?([A-Za-z0-9+\-=]+)\}?",
+                r"<sub>\1</sub>",
+                expression,
+            )
+            formatted_parts.append(expression)
+        else:
+            formatted_parts.append(escape(part))
+
+    formatted = "".join(formatted_parts).replace("`", "")
+    formatted = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", formatted)
+    formatted = re.sub(r"(?<!\*)\*([^*\n]+)\*(?!\*)", r"<i>\1</i>", formatted)
+    return formatted
+
+
 class PDFGeneratorTool:
     """Tool for generating PDF files."""
 
@@ -78,7 +117,11 @@ class PDFGeneratorTool:
         # Render common Markdown structure as document elements, escaping text
         # so characters such as '&' and '<' cannot break ReportLab's parser.
         for block in re.split(r"\n\s*\n", content.strip()):
-            lines = [line.strip() for line in block.splitlines() if line.strip()]
+            lines = [
+                line.strip()
+                for line in block.splitlines()
+                if line.strip() and not re.fullmatch(r"(?:-{3,}|\*{3,}|_{3,})", line.strip())
+            ]
             if not lines:
                 continue
             prose_lines = []
@@ -94,14 +137,18 @@ class PDFGeneratorTool:
                 numbered = re.match(r"^(\d+)[.)]\s+(.+)$", line)
                 if heading:
                     flush_prose()
-                    story.append(Paragraph(escape(heading.group(1)), styles["Heading2"]))
+                    story.append(
+                        Paragraph(_format_inline_markup(heading.group(1)), styles["Heading2"])
+                    )
                 elif bullet or numbered:
                     flush_prose()
                     text = bullet.group(1) if bullet else numbered.group(2)
                     marker = "•" if bullet else f"{numbered.group(1)}."
-                    story.append(Paragraph(escape(text), styles["Normal"], bulletText=marker))
+                    story.append(
+                        Paragraph(_format_inline_markup(text), styles["Normal"], bulletText=marker)
+                    )
                 else:
-                    prose_lines.append(escape(line))
+                    prose_lines.append(_format_inline_markup(line))
             flush_prose()
             story.append(Spacer(1, 0.1 * inch))
 
