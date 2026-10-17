@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Research, write, summarize, and refine documents with a multi-agent AI workflow." />
+    <title>Orchestrator — AI document studio</title>
+    <style>
+      :root {
+        --ink: #172033;
+        --muted: #68738a;
+        --line: #e8eaf0;
+        --paper: #ffffff;
+        --canvas: #f7f8fc;
+        --violet: #6657ee;
+        --violet-dark: #5143d4;
+        --teal: #2cb7a9;
+        --shadow: 0 24px 60px rgba(28, 36, 68, .10);
+        --radius: 20px;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        color: var(--ink);
+        background: var(--canvas);
+        font: 15px/1.55 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+      button, input, select, textarea { font: inherit; }
+      button { cursor: pointer; }
+      .shell { max-width: 1180px; margin: 0 auto; padding: 26px 22px 54px; }
+      .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 54px; }
+      .brand { display: flex; align-items: center; gap: 12px; font-weight: 800; letter-spacing: -.02em; }
+      .brand-mark { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 12px; color: white; background: linear-gradient(135deg, var(--violet), #9079f9); box-shadow: 0 10px 22px rgba(102, 87, 238, .26); }
+      .brand small { display: block; color: var(--muted); font-size: 11px; font-weight: 600; letter-spacing: .03em; }
+      .health { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 13px; }
+      .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--teal); box-shadow: 0 0 0 5px rgba(44, 183, 169, .12); }
+      .hero { display: grid; grid-template-columns: 1.08fr .92fr; gap: 56px; align-items: center; margin-bottom: 38px; }
+      .eyebrow { color: var(--violet); font-size: 12px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+      h1 { max-width: 650px; margin: 12px 0 18px; font-size: clamp(40px, 6vw, 70px); line-height: .98; letter-spacing: -.065em; }
+      .hero-copy { max-width: 570px; margin: 0; color: var(--muted); font-size: 18px; }
+      .hero-card { position: relative; min-height: 260px; padding: 27px; overflow: hidden; border: 1px solid rgba(255,255,255,.7); border-radius: 28px; background: linear-gradient(145deg, #242a5a, #5147b9 55%, #8d7cf6); color: white; box-shadow: var(--shadow); }
+      .hero-card:after { content: ""; position: absolute; width: 210px; height: 210px; right: -72px; top: -72px; border: 32px solid rgba(255,255,255,.12); border-radius: 50%; }
+      .hero-card h2 { max-width: 250px; margin: 0 0 38px; font-size: 25px; line-height: 1.12; letter-spacing: -.04em; }
+      .pipeline { display: flex; align-items: center; gap: 8px; color: rgba(255,255,255,.82); font-size: 12px; font-weight: 700; }
+      .pipeline span { display: grid; place-items: center; width: 39px; height: 39px; border-radius: 12px; background: rgba(255,255,255,.16); }
+      .pipeline i { width: 22px; height: 1px; background: rgba(255,255,255,.35); }
+      .workspace { display: grid; grid-template-columns: 205px 1fr; min-height: 520px; overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper); box-shadow: var(--shadow); }
+      .tabs { padding: 18px 12px; border-right: 1px solid var(--line); background: #fbfbfe; }
+      .tabs-label { padding: 6px 12px 11px; color: #9aa2b3; font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+      .tab { display: flex; align-items: center; gap: 10px; width: 100%; margin: 3px 0; padding: 12px; border: 0; border-radius: 11px; background: transparent; color: var(--muted); text-align: left; font-weight: 700; }
+      .tab:hover { background: #f0efff; color: var(--violet-dark); }
+      .tab.active { background: #eceaff; color: var(--violet-dark); }
+      .tab-icon { width: 22px; text-align: center; font-size: 17px; }
+      .panel { padding: 34px 38px; }
+      .panel-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; margin-bottom: 27px; }
+      .panel h2 { margin: 0 0 5px; font-size: 25px; letter-spacing: -.035em; }
+      .panel-header p { margin: 0; color: var(--muted); }
+      .badge { padding: 7px 10px; border-radius: 99px; background: #f3f4f8; color: var(--muted); font-size: 11px; font-weight: 800; white-space: nowrap; }
+      .form-grid { display: grid; grid-template-columns: 1fr 190px; gap: 18px; }
+      .field { margin-bottom: 18px; }
+      label { display: block; margin-bottom: 8px; color: #47516a; font-size: 13px; font-weight: 800; }
+      input, select, textarea { width: 100%; border: 1px solid #dfe2eb; border-radius: 11px; outline: 0; background: #fff; color: var(--ink); transition: border .2s, box-shadow .2s; }
+      input, select { height: 47px; padding: 0 14px; }
+      textarea { min-height: 180px; padding: 13px 14px; resize: vertical; }
+      input:focus, select:focus, textarea:focus { border-color: var(--violet); box-shadow: 0 0 0 4px rgba(102, 87, 238, .11); }
+      .hint { margin: -2px 0 20px; color: var(--muted); font-size: 12px; }
+      .button { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 48px; padding: 0 19px; border: 0; border-radius: 11px; background: linear-gradient(135deg, var(--violet), #8172f3); color: white; font-weight: 800; box-shadow: 0 10px 18px rgba(102, 87, 238, .20); transition: transform .18s, box-shadow .18s; }
+      .button:hover { transform: translateY(-2px); box-shadow: 0 14px 24px rgba(102, 87, 238, .27); }
+      .button:disabled { cursor: wait; opacity: .65; transform: none; }
+      .secondary { border: 1px solid var(--line); background: white; color: var(--ink); box-shadow: none; }
+      .options { display: flex; flex-wrap: wrap; gap: 15px 25px; margin: 2px 0 24px; }
+      .check { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 13px; font-weight: 600; }
+      .check input { width: 16px; height: 16px; accent-color: var(--violet); }
+      .hidden { display: none !important; }
+      .progress-wrap { margin: 28px 0 0; }
+      .progress-top { display: flex; justify-content: space-between; color: var(--muted); font-size: 12px; font-weight: 700; }
+      .progress { height: 7px; margin-top: 8px; overflow: hidden; border-radius: 99px; background: #eceef4; }
+      .progress-bar { width: 10%; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--violet), var(--teal)); transition: width .35s ease; }
+      .result { margin-top: 28px; padding: 22px; border: 1px solid #e3e3f5; border-radius: 15px; background: #fafaff; }
+      .result h3 { margin: 0 0 13px; font-size: 17px; }
+      .result-body { max-height: 460px; overflow: auto; padding: 17px; border: 1px solid var(--line); border-radius: 10px; background: white; color: #37415a; white-space: pre-wrap; }
+      .result-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; }
+      .source-list { margin: 11px 0 0; padding-left: 20px; color: var(--muted); font-size: 13px; }
+      .source-list a { color: var(--violet-dark); }
+      .error { margin-top: 18px; padding: 13px 15px; border-radius: 10px; background: #fff2f2; color: #a53d4a; font-size: 13px; }
+      footer { display: flex; justify-content: space-between; gap: 20px; margin-top: 28px; color: #9aa2b3; font-size: 12px; }
+      @media (max-width: 820px) { .hero { grid-template-columns: 1fr; gap: 28px; } .hero-card { min-height: 220px; } .workspace { grid-template-columns: 1fr; } .tabs { display: flex; gap: 4px; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--line); padding: 11px; } .tabs-label { display: none; } .tab { width: auto; white-space: nowrap; } .panel { padding: 28px 22px; } }
+      @media (max-width: 560px) { .topbar { margin-bottom: 35px; } .health { display: none; } h1 { font-size: 46px; } .form-grid { grid-template-columns: 1fr; gap: 0; } .panel-header { display: block; } .badge { display: inline-block; margin-top: 13px; } footer { display: block; } }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <nav class="topbar">
+        <div class="brand"><div class="brand-mark">✦</div><div>Orchestrator<small>AI DOCUMENT STUDIO</small></div></div>
+        <div class="health"><span class="dot"></span> Multi-agent workspace</div>
+      </nav>
+
+      <section class="hero">
+        <div>
+          <div class="eyebrow">Research → write → refine</div>
+          <h1>Turn a blank page into something brilliant.</h1>
+          <p class="hero-copy">A focused AI workspace for research-backed documents, crisp summaries, and blog posts that are ready to share.</p>
+        </div>
+        <div class="hero-card">
+          <h2>Your ideas, orchestrated by a team of agents.</h2>
+          <div class="pipeline"><span>⌕</span><i></i><span>✎</span><i></i><span>✓</span><i></i><span>↗</span></div>
+        </div>
+      </section>
+
+      <section class="workspace">
+        <aside class="tabs">
+          <div class="tabs-label">Workspace</div>
+          <button class="tab active" data-view="generate"><span class="tab-icon">▤</span>Document</button>
+          <button class="tab" data-view="summarize"><span class="tab-icon">≡</span>Summarize</button>
+          <button class="tab" data-view="blog"><span class="tab-icon">✎</span>Blog writer</button>
+        </aside>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div><h2 id="panel-title">Create a document</h2><p id="panel-subtitle">Go from topic to polished output with research and quality checks.</p></div>
+            <div class="badge">Gemini + Tavily</div>
+          </div>
+
+          <form id="generate-form" data-form="generate">
+            <div class="form-grid">
+              <div class="field"><label for="topic">What should we work on?</label><input id="topic" name="topic" required maxlength="240" placeholder="e.g. The future of renewable energy" /></div>
+              <div class="field"><label for="format">Output format</label><select id="format" name="format"><option value="text">Editable text</option><option value="pdf">PDF document</option><option value="google_docs">Google Docs</option></select></div>
+            </div>
+            <p class="hint">We’ll research the topic, extract the useful signal, write a draft, and run a quality check.</p>
+            <button class="button" type="submit">✦ Generate document</button>
+          </form>
+
+          <form id="summarize-form" class="hidden" data-form="summarize">
+            <div class="field"><label>Choose your starting point</label><div class="options"><label class="check"><input type="radio" name="summary-mode" value="research" checked /> Research a topic</label><label class="check"><input type="radio" name="summary-mode" value="paste" /> Paste content</label></div></div>
+            <div id="research-input" class="field"><label for="summary-topic">Topic to research</label><input id="summary-topic" placeholder="e.g. How does quantum computing work?" /></div>
+            <div id="paste-input" class="field hidden"><label for="summary-content">Content to summarize</label><textarea id="summary-content" placeholder="Paste an article, notes, or meeting transcript..."></textarea></div>
+            <button class="button" type="submit">⌕ Create summary</button>
+          </form>
+
+          <form id="blog-form" class="hidden" data-form="blog">
+            <div class="form-grid"><div class="field"><label for="blog-topic">Blog topic</label><input id="blog-topic" required placeholder="e.g. 10 ways to write better Python" /></div><div class="field"><label for="tone">Tone</label><select id="tone"><option>Professional</option><option>Casual</option><option>Friendly</option><option>Technical</option><option>Conversational</option></select></div></div>
+            <div class="field"><label for="length">Target length: <span id="length-value">1000</span> words</label><input id="length" type="range" min="500" max="3000" step="100" value="1000" /></div>
+            <div class="options"><label class="check"><input id="intro" type="checkbox" checked /> Include introduction</label><label class="check"><input id="conclusion" type="checkbox" checked /> Include conclusion</label></div>
+            <button class="button" type="submit">✎ Write blog post</button>
+          </form>
+
+          <div id="progress-wrap" class="progress-wrap hidden"><div class="progress-top"><span id="progress-label">Preparing your workspace…</span><span id="progress-value">10%</span></div><div class="progress"><div id="progress-bar" class="progress-bar"></div></div></div>
+          <div id="error" class="error hidden"></div>
+          <div id="result" class="result hidden"></div>
+        </div>
+      </section>
+      <footer><span>Built for thoughtful, research-backed work.</span><span>Vercel-ready serverless API</span></footer>
+    </main>
+
+    <script>
+      const $ = (id) => document.getElementById(id);
+      const views = {
+        generate: ['Create a document', 'Go from topic to polished output with research and quality checks.'],
+        summarize: ['Find the signal', 'Turn research or rough notes into a clear, structured summary.'],
+        blog: ['Write a blog post', 'Shape research into an engaging article with a voice that fits.']
+      };
+      let activeView = 'generate';
+
+      document.querySelectorAll('.tab').forEach((tab) => tab.addEventListener('click', () => {
+        activeView = tab.dataset.view;
+        document.querySelectorAll('.tab').forEach((item) => item.classList.toggle('active', item === tab));
+        document.querySelectorAll('[data-form]').forEach((form) => form.classList.toggle('hidden', form.dataset.form !== activeView));
+        $('panel-title').textContent = views[activeView][0];
+        $('panel-subtitle').textContent = views[activeView][1];
+        $('result').classList.add('hidden'); $('error').classList.add('hidden');
+      }));
+
+      document.querySelectorAll('input[name="summary-mode"]').forEach((radio) => radio.addEventListener('change', (event) => {
+        const isResearch = event.target.value === 'research';
+        $('research-input').classList.toggle('hidden', !isResearch); $('paste-input').classList.toggle('hidden', isResearch);
+      }));
+      $('length').addEventListener('input', (event) => $('length-value').textContent = event.target.value);
+
+      function setBusy(busy, label = 'Working through the agent workflow…') {
+        $('progress-wrap').classList.toggle('hidden', !busy); $('error').classList.add('hidden');
+        if (busy) { $('progress-label').textContent = label; $('progress-value').textContent = '10%'; $('progress-bar').style.width = '10%'; }
+        document.querySelectorAll('button[type="submit"]').forEach((button) => { button.disabled = busy; });
+      }
+      function showError(message) { setBusy(false); $('error').textContent = message; $('error').classList.remove('hidden'); }
+      function progress(label, value) { $('progress-label').textContent = label; $('progress-value').textContent = `${value}%`; $('progress-bar').style.width = `${value}%`; }
+
+      async function request(endpoint, payload) {
+        setBusy(true); progress('Researching and gathering context…', 28);
+        const response = await fetch(endpoint, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
+        progress('Writing and checking the result…', 74);
+        const data = await response.json();
+        if (!response.ok || !data.ok) throw new Error(data.error || 'Something went wrong.');
+        progress('Ready to review.', 100); return data.result;
+      }
+
+      function renderResult(title, body, actions = '', sources = []) {
+        const result = $('result'); result.innerHTML = '';
+        const heading = document.createElement('h3'); heading.textContent = title;
+        const content = document.createElement('div'); content.className = 'result-body'; content.textContent = body;
+        const actionRow = document.createElement('div'); actionRow.className = 'result-actions'; actionRow.innerHTML = actions;
+        result.append(heading, content);
+        const cleanSources = sources.filter(Boolean).slice(0, 8);
+        if (cleanSources.length) {
+          const list = document.createElement('ul'); list.className = 'source-list';
+          cleanSources.forEach((source) => { const item = document.createElement('li'); const anchor = document.createElement('a'); anchor.href = source; anchor.target = '_blank'; anchor.rel = 'noreferrer'; anchor.textContent = source; item.appendChild(anchor); list.appendChild(item); });
+          result.appendChild(list);
+        }
+        result.appendChild(actionRow); result.classList.remove('hidden'); setBusy(false);
+      }
+      function download(data, filename, mime) { const binary = atob(data); const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0)); const url = URL.createObjectURL(new Blob([bytes], {type: mime})); const anchor = document.createElement('a'); anchor.href = url; anchor.download = filename; anchor.click(); URL.revokeObjectURL(url); }
+      function textDownload(content, filename, mime = 'text/plain') { const url = URL.createObjectURL(new Blob([content], {type: mime})); const anchor = document.createElement('a'); anchor.href = url; anchor.download = filename; anchor.click(); URL.revokeObjectURL(url); }
+
+      $('generate-form').addEventListener('submit', async (event) => { event.preventDefault(); const topic = $('topic').value.trim(); if (!topic) return showError('Please add a topic first.'); try { const result = await request('/api/generate', {topic, format: $('format').value}); const safeTopic = topic.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); let actions = ''; if (result.file_data) actions = `<button class="button" id="download-file">⇩ Download PDF</button>`; else if (result.content) actions = `<button class="button secondary" id="download-text">⇩ Download .txt</button>`; if (result.url) actions += `<a class="button" href="${result.url}" target="_blank" rel="noreferrer">↗ Open Google Doc</a>`; renderResult('Your document is ready', result.content || 'Your file was generated successfully. Use the download action below.', actions); if (result.file_data) $('download-file').onclick = () => download(result.file_data, result.filename || `${safeTopic}.pdf`, result.mime_type); if (result.content) $('download-text').onclick = () => textDownload(result.content, `${safeTopic || 'document'}.txt`); } catch (error) { showError(error.message); } });
+
+      $('summarize-form').addEventListener('submit', async (event) => { event.preventDefault(); const mode = document.querySelector('input[name="summary-mode"]:checked').value; const payload = mode === 'research' ? {topic: $('summary-topic').value.trim()} : {content: $('summary-content').value.trim()}; if (!payload.topic && !payload.content) return showError('Add a topic or paste content first.'); try { const result = await request('/api/summarize', payload); const body = `${result.summary}\n\nKEY POINTS\n${(result.key_points || []).map((point) => `• ${point}`).join('\n')}`; renderResult('Summary ready', body, `<button class="button secondary" id="download-summary">⇩ Download summary</button>`, result.sources || []); $('download-summary').onclick = () => textDownload(body, 'summary.txt'); } catch (error) { showError(error.message); } });
+
+      $('blog-form').addEventListener('submit', async (event) => { event.preventDefault(); const topic = $('blog-topic').value.trim(); if (!topic) return showError('Add a blog topic first.'); try { const result = await request('/api/blog', {topic, tone: $('tone').value, target_length: Number($('length').value), include_intro: $('intro').checked, include_conclusion: $('conclusion').checked}); renderResult('Your blog post is ready', result.content, `<button class="button secondary" id="download-blog">⇩ Download Markdown</button>`); $('download-blog').onclick = () => textDownload(result.content, `${topic.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.md`, 'text/markdown'); } catch (error) { showError(error.message); } });
+    </script>
+  </body>
+</html>

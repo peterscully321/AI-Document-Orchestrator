@@ -81,6 +81,24 @@ streamlit run app.py
 
 Open: **[http://localhost:8501](http://localhost:8501)**
 
+### Deploy the Vercel UI
+
+Vercel cannot run Streamlit's long-lived server directly, so this repository includes a Vercel-ready web UI and Python serverless API. The original Streamlit app remains available for local use.
+
+1. Push this repository to GitHub and import it into Vercel.
+2. Add these Project Environment Variables in Vercel:
+
+   ```env
+   GOOGLE_GEMINI_API_KEY=your_key_here
+   TAVILY_API_KEY=your_key_here
+   # Optional: minified service-account JSON for the Google Docs output
+   GOOGLE_CREDENTIALS_JSON={"type":"service_account", ...}
+   ```
+
+3. Deploy with the default project settings. Vercel serves `public/index.html` and routes `/api/generate`, `/api/summarize`, and `/api/blog` to the Python function in `api/index.py`.
+
+The PDF workflow returns the generated file directly to the browser, which keeps it compatible with Vercel's ephemeral serverless filesystem. Google Docs output requires the optional `GOOGLE_CREDENTIALS_JSON` service-account secret.
+
 ### Command Line Usage
 
 ```bash
