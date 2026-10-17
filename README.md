@@ -96,6 +96,7 @@ Vercel cannot run Streamlit's long-lived server directly, so this repository inc
    ```
 
 3. Deploy with the default project settings. Vercel serves `public/index.html` and routes `/api/generate`, `/api/summarize`, and `/api/blog` to the Python function in `api/index.py`.
+4. Keep serverless dependencies scoped to `api/requirements.txt` (instead of root `requirements.txt`) so the Vercel Python function bundle stays under the 500 MB limit.
 
 The PDF workflow returns the generated file directly to the browser, which keeps it compatible with Vercel's ephemeral serverless filesystem. Google Docs output requires the optional `GOOGLE_CREDENTIALS_JSON` service-account secret.
 
