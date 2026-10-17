@@ -18,7 +18,7 @@ class BaseAgent(ABC):
         self,
         name: str,
         gemini_api_key: Optional[str] = None,
-        model: str = "gemini-2.5-flash",
+        model: str = "gemini-3.8-flash",
     ):
         """Initialize the agent.
 

@@ -11,7 +11,7 @@ from ai_doc_orchestrator.tools.pdf_generator import PDFGeneratorTool
 class FormattingAgent(BaseAgent):
     """Agent responsible for formatting approved drafts into final outputs."""
 
-    def __init__(self, gemini_api_key=None, model: str = "gemini-2.5-flash"):
+    def __init__(self, gemini_api_key=None, model: str = "gemini-3.8-flash"):
         """Initialize the Formatting Agent."""
         super().__init__("FormattingAgent", gemini_api_key, model)
         self.google_docs_tool: Optional[GoogleDocsTool] = None

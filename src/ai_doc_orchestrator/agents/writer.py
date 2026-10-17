@@ -9,7 +9,7 @@ from ai_doc_orchestrator.models import AgentMessage, Draft, StructuredNotes
 class WriterAgent(BaseAgent):
     """Agent responsible for writing drafts from structured notes."""
 
-    def __init__(self, gemini_api_key=None, model: str = "gemini-2.5-flash"):
+    def __init__(self, gemini_api_key=None, model: str = "gemini-3.8-flash"):
         """Initialize the Writer Agent."""
         super().__init__("WriterAgent", gemini_api_key, model)
 

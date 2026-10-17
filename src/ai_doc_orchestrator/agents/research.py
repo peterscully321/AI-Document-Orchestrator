@@ -10,7 +10,7 @@ from ai_doc_orchestrator.tools.search import SearchTool
 class ResearchAgent(BaseAgent):
     """Agent responsible for gathering raw data through web search."""
 
-    def __init__(self, gemini_api_key=None, model: str = "gemini-2.5-flash"):
+    def __init__(self, gemini_api_key=None, model: str = "gemini-3.8-flash"):
         """Initialize the Research Agent."""
         super().__init__("ResearchAgent", gemini_api_key, model)
         self.search_tool: SearchTool = None

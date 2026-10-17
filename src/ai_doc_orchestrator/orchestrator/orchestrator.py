@@ -31,7 +31,7 @@ class DocumentOrchestrator:
     def __init__(
         self,
         gemini_api_key: Optional[str] = None,
-        model: str = "gemini-2.5-flash",
+        model: str = "gemini-3.8-flash",
         tavily_api_key: Optional[str] = None,
         google_credentials_path: Optional[str] = None,
         output_dir: Optional[str] = None,

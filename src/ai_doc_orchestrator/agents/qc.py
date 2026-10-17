@@ -9,7 +9,7 @@ from ai_doc_orchestrator.models import AgentMessage, Draft, QCFeedback
 class QCAgent(BaseAgent):
     """Agent responsible for quality checking drafts."""
 
-    def __init__(self, gemini_api_key=None, model: str = "gemini-2.5-flash"):
+    def __init__(self, gemini_api_key=None, model: str = "gemini-3.8-flash"):
         """Initialize the QC Agent."""
         super().__init__("QCAgent", gemini_api_key, model)
         self.max_iterations = 3

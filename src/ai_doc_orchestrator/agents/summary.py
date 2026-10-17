@@ -10,7 +10,7 @@ from ai_doc_orchestrator.tools.mcp_filesystem import MCPFileSystemTool
 class SummaryAgent(BaseAgent):
     """Agent responsible for summarizing raw data into structured notes."""
 
-    def __init__(self, gemini_api_key=None, model: str = "gemini-2.5-flash"):
+    def __init__(self, gemini_api_key=None, model: str = "gemini-3.8-flash"):
         """Initialize the Summary Agent."""
         super().__init__("SummaryAgent", gemini_api_key, model)
         self.fs_tool: Optional[MCPFileSystemTool] = None
