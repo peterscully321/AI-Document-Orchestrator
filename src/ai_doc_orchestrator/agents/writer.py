@@ -29,6 +29,7 @@ class WriterAgent(BaseAgent):
         feedback = message.data.get("feedback", "")
         version = message.data.get("version", 1)
         blog_instructions = message.data.get("blog_instructions", "")
+        max_output_tokens = message.data.get("max_output_tokens")
 
         # Build the writing prompt
         if blog_instructions:
@@ -61,7 +62,14 @@ Sources: {', '.join(structured_notes.sources[:5])}
             user_prompt += f"\n\nPrevious Feedback (for revision):\n{feedback}\n\nPlease revise the draft addressing this feedback."
 
         # Generate the draft
-        draft_content = self._call_llm(system_prompt, user_prompt, temperature=0.7)
+        draft_content = self._call_llm(
+            system_prompt,
+            user_prompt,
+            temperature=0.7,
+            max_output_tokens=max_output_tokens,
+        )
+        if not draft_content.strip():
+            raise RuntimeError("Gemini returned an empty draft. Please try again with a shorter topic.")
 
         # Create Draft object
         draft = Draft(

@@ -95,6 +95,7 @@ class BaseAgent(ABC):
         system_prompt: str,
         user_prompt: str,
         temperature: float = 0.7,
+        max_output_tokens: Optional[int] = None,
     ) -> str:
         """Call the LLM with given prompts.
 
@@ -118,10 +119,13 @@ class BaseAgent(ABC):
         generation_config = {
             "temperature": temperature,
         }
+        if max_output_tokens is not None:
+            generation_config["max_output_tokens"] = max_output_tokens
         
         response = model.generate_content(
             full_prompt,
             generation_config=generation_config,
+            request_options={"timeout": 90},
         )
         
         return response.text or ""
