@@ -76,6 +76,8 @@
       .progress-top { display: flex; justify-content: space-between; color: var(--muted); font-size: 12px; font-weight: 700; }
       .progress { height: 7px; margin-top: 8px; overflow: hidden; border-radius: 99px; background: #eceef4; }
       .progress-bar { width: 10%; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--violet), var(--teal)); transition: width .35s ease; }
+      .progress-bar.is-loading { width: 34%; animation: progress-sweep 1.5s ease-in-out infinite; }
+      @keyframes progress-sweep { from { transform: translateX(-105%); } to { transform: translateX(300%); } }
       .result { margin-top: 28px; padding: 22px; border: 1px solid #e3e3f5; border-radius: 15px; background: #fafaff; }
       .result h3 { margin: 0 0 13px; font-size: 17px; }
       .result-body { max-height: 460px; overflow: auto; padding: 17px; border: 1px solid var(--line); border-radius: 10px; background: white; color: #37415a; white-space: pre-wrap; }
@@ -144,7 +146,7 @@
             <button class="button" type="submit">✎ Write blog post</button>
           </form>
 
-          <div id="progress-wrap" class="progress-wrap hidden"><div class="progress-top"><span id="progress-label">Preparing your workspace…</span><span id="progress-value">10%</span></div><div class="progress"><div id="progress-bar" class="progress-bar"></div></div></div>
+          <div id="progress-wrap" class="progress-wrap hidden"><div class="progress-top"><span id="progress-label">Preparing your workspace…</span><span id="progress-value">0s</span></div><div class="progress"><div id="progress-bar" class="progress-bar"></div></div></div>
           <div id="error" class="error hidden"></div>
           <div id="result" class="result hidden"></div>
         </div>
@@ -178,22 +180,29 @@
 
       function setBusy(busy, label = 'Working through the agent workflow…') {
         $('progress-wrap').classList.toggle('hidden', !busy); $('error').classList.add('hidden');
-        if (busy) { $('progress-label').textContent = label; $('progress-value').textContent = '10%'; $('progress-bar').style.width = '10%'; }
+        $('progress-bar').classList.toggle('is-loading', busy);
+        if (busy) { $('progress-label').textContent = label; $('progress-value').textContent = '0s'; $('progress-bar').style.width = ''; }
         document.querySelectorAll('button[type="submit"]').forEach((button) => { button.disabled = busy; });
       }
       function showError(message) { setBusy(false); $('error').textContent = message; $('error').classList.remove('hidden'); }
-      function progress(label, value) { $('progress-label').textContent = label; $('progress-value').textContent = `${value}%`; $('progress-bar').style.width = `${value}%`; }
+      function progress(label, value) {
+        $('progress-label').textContent = label; $('progress-value').textContent = `${value}%`; $('progress-bar').style.width = `${value}%`;
+        if (value >= 100) {
+          $('progress-bar').classList.remove('is-loading');
+          document.querySelectorAll('button[type="submit"]').forEach((button) => { button.disabled = false; });
+        }
+      }
 
       async function request(endpoint, payload) {
-        setBusy(true); progress('Researching and gathering context…', 28);
+        setBusy(true, 'Researching and drafting your document…');
         const controller = new AbortController();
         const timeoutId = window.setTimeout(() => controller.abort(), 240000);
         const startedAt = Date.now();
         const statusTimer = window.setInterval(() => {
           const elapsed = Math.floor((Date.now() - startedAt) / 1000);
           $('progress-label').textContent = elapsed < 30
-            ? 'Researching and gathering context…'
-            : `Still working — ${Math.floor(elapsed / 60)}m ${elapsed % 60}s elapsed.`;
+            ? 'Researching and drafting your document…'
+            : `Creating your document — ${Math.floor(elapsed / 60)}m ${elapsed % 60}s elapsed.`;
           $('progress-value').textContent = `${elapsed}s`;
         }, 1000);
         let response;
@@ -206,7 +215,7 @@
           window.clearTimeout(timeoutId);
           window.clearInterval(statusTimer);
         }
-        progress('Writing and checking the result…', 74);
+        $('progress-label').textContent = 'Preparing your finished document…';
         const data = await response.json();
         if (!response.ok || !data.ok) throw new Error(data.error || 'Something went wrong.');
         progress('Ready to review.', 100); return data.result;

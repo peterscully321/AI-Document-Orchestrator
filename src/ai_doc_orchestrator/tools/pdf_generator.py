@@ -1,8 +1,10 @@
 """PDF generator tool."""
 
 import os
+import re
 from pathlib import Path
 from typing import Any, Dict, Optional
+from xml.sax.saxutils import escape
 
 try:
     from reportlab.lib.pagesizes import letter
@@ -70,17 +72,38 @@ class PDFGeneratorTool:
         # Add title if provided
         if title:
             title_style = styles["Heading1"]
-            story.append(Paragraph(title, title_style))
+            story.append(Paragraph(escape(title), title_style))
             story.append(Spacer(1, 0.2 * inch))
 
-        # Split content into paragraphs and add to story
-        paragraphs = content.split("\n\n")
-        for para in paragraphs:
-            if para.strip():
-                # Clean up the paragraph text
-                para_text = para.strip().replace("\n", "<br/>")
-                story.append(Paragraph(para_text, styles["Normal"]))
-                story.append(Spacer(1, 0.1 * inch))
+        # Render common Markdown structure as document elements, escaping text
+        # so characters such as '&' and '<' cannot break ReportLab's parser.
+        for block in re.split(r"\n\s*\n", content.strip()):
+            lines = [line.strip() for line in block.splitlines() if line.strip()]
+            if not lines:
+                continue
+            prose_lines = []
+
+            def flush_prose():
+                if prose_lines:
+                    story.append(Paragraph("<br/>".join(prose_lines), styles["Normal"]))
+                    prose_lines.clear()
+
+            for line in lines:
+                heading = re.match(r"^#{1,6}\s+(.+)$", line)
+                bullet = re.match(r"^[-*]\s+(.+)$", line)
+                numbered = re.match(r"^(\d+)[.)]\s+(.+)$", line)
+                if heading:
+                    flush_prose()
+                    story.append(Paragraph(escape(heading.group(1)), styles["Heading2"]))
+                elif bullet or numbered:
+                    flush_prose()
+                    text = bullet.group(1) if bullet else numbered.group(2)
+                    marker = "•" if bullet else f"{numbered.group(1)}."
+                    story.append(Paragraph(escape(text), styles["Normal"], bulletText=marker))
+                else:
+                    prose_lines.append(escape(line))
+            flush_prose()
+            story.append(Spacer(1, 0.1 * inch))
 
         # Build PDF
         doc.build(story)

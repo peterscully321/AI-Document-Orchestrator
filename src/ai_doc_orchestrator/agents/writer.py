@@ -6,6 +6,20 @@ from ai_doc_orchestrator.base_agent import BaseAgent
 from ai_doc_orchestrator.models import AgentMessage, Draft, StructuredNotes
 
 
+def _is_typesetting_source(text: str) -> bool:
+    """Detect when the model returned a layout language instead of document prose."""
+    lowered = text.lower()
+    markers = (
+        "```typst",
+        "#set page(",
+        "#set text(",
+        "#set par(",
+        "#show heading",
+        "locate(top",
+    )
+    return "```typst" in lowered or sum(marker in lowered for marker in markers[1:]) >= 2
+
+
 class WriterAgent(BaseAgent):
     """Agent responsible for writing drafts from structured notes."""
 
@@ -55,6 +69,15 @@ Key Points:
 Sources: {', '.join(structured_notes.sources[:5])}
 """
 
+        if format_type == "pdf":
+            user_prompt += """
+
+PDF OUTPUT RULES:
+- Write the finished document itself in readable prose.
+- Use plain text headings and simple bullets where useful.
+- Never output Typst, LaTeX, HTML, PDF layout/configuration code, or code fences.
+"""
+
         if blog_instructions:
             user_prompt += f"\n\n{blog_instructions}"
         
@@ -68,6 +91,17 @@ Sources: {', '.join(structured_notes.sources[:5])}
             temperature=0.7,
             max_output_tokens=max_output_tokens,
         )
+        if format_type == "pdf" and _is_typesetting_source(draft_content):
+            draft_content = self._call_llm(
+                "You are an editor. Convert document-layout source into a polished, readable document.",
+                f"Rewrite this as the finished document about {topic}. Keep its useful facts, but do not include source code, markup, or code fences.\n\n{draft_content}",
+                temperature=0.2,
+                max_output_tokens=max_output_tokens,
+            )
+            if _is_typesetting_source(draft_content):
+                raise RuntimeError(
+                    "Gemini returned PDF layout code instead of document text. Please retry once."
+                )
         if not draft_content.strip():
             raise RuntimeError("Gemini returned an empty draft. Please try again with a shorter topic.")
 
