@@ -8,7 +8,7 @@
 ![Repo size](https://img.shields.io/github/repo-size/peterscully321/AI-Document-Orchestrator)
 ![Code style](https://img.shields.io/badge/code%20style-black-000000.svg)
 
-**📖 [Documentation](https://github.com/peterscully321/AI-Document-Orchestrator/wiki)** · **🚀 [Quick Start](#-quick-start)** · **📝 [API Setup](#-api-setup)** · **🐛 [Report Bug](https://github.com/peterscully321/AI-Document-Orchestrator/issues)**
+**🌐 [Live Demo](https://ai-document-orchestrator-brown.vercel.app)** · **📖 [Documentation](https://github.com/peterscully321/AI-Document-Orchestrator/wiki)** · **🚀 [Quick Start](#-quick-start)** · **📝 [API Setup](#-api-setup)** · **🐛 [Report Bug](https://github.com/peterscully321/AI-Document-Orchestrator/issues)**
 
 ---
 
@@ -23,6 +23,10 @@
 - 🔄 **Agent Communication** — A2A protocol
 - ⚡ **Async Processing** — Non-blocking operations
 - 🔐 **Secure API Integration** — Environment variables only
+
+## 🧰 Tech Stack
+
+Python 3.10+, Google Gemini API, Tavily Search API, Pydantic, ReportLab, Google Docs API, Streamlit (local UI), Vercel (web UI and serverless API).
 
 ---
 
